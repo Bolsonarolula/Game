@@ -330,3 +330,96 @@ window.addEventListener('keyup', (event) => {
       break
   }
 })
+
+// Mobile Controls
+function setupMobileControls() {
+  // Helper function to handle touch/mouse events
+  function addControlEvents(elementId, onStart, onEnd) {
+    const element = document.getElementById(elementId)
+    if (!element) return
+
+    // Touch events
+    element.addEventListener('touchstart', (e) => {
+      e.preventDefault()
+      element.classList.add('active')
+      onStart()
+    }, { passive: false })
+
+    element.addEventListener('touchend', (e) => {
+      e.preventDefault()
+      element.classList.remove('active')
+      if (onEnd) onEnd()
+    }, { passive: false })
+
+    element.addEventListener('touchcancel', (e) => {
+      element.classList.remove('active')
+      if (onEnd) onEnd()
+    })
+
+    // Mouse events for testing on desktop
+    element.addEventListener('mousedown', (e) => {
+      e.preventDefault()
+      element.classList.add('active')
+      onStart()
+    })
+
+    element.addEventListener('mouseup', (e) => {
+      element.classList.remove('active')
+      if (onEnd) onEnd()
+    })
+
+    element.addEventListener('mouseleave', (e) => {
+      element.classList.remove('active')
+      if (onEnd) onEnd()
+    })
+  }
+
+  // Player 1 Controls
+  addControlEvents('p1-left', 
+    () => { keys.a.pressed = true; player.lastKey = 'a' },
+    () => { keys.a.pressed = false }
+  )
+
+  addControlEvents('p1-right',
+    () => { keys.d.pressed = true; player.lastKey = 'd' },
+    () => { keys.d.pressed = false }
+  )
+
+  addControlEvents('p1-jump',
+    () => { if (!player.dead && player.velocity.y === 0) player.velocity.y = -20 },
+    null
+  )
+
+  addControlEvents('p1-attack',
+    () => { if (!player.dead) player.attack() },
+    null
+  )
+
+  // Player 2 (Enemy) Controls
+  addControlEvents('p2-left',
+    () => { keys.ArrowLeft.pressed = true; enemy.lastKey = 'ArrowLeft' },
+    () => { keys.ArrowLeft.pressed = false }
+  )
+
+  addControlEvents('p2-right',
+    () => { keys.ArrowRight.pressed = true; enemy.lastKey = 'ArrowRight' },
+    () => { keys.ArrowRight.pressed = false }
+  )
+
+  addControlEvents('p2-jump',
+    () => { if (!enemy.dead && enemy.velocity.y === 0) enemy.velocity.y = -20 },
+    null
+  )
+
+  addControlEvents('p2-attack',
+    () => { if (!enemy.dead) enemy.attack() },
+    null
+  )
+}
+
+// Initialize mobile controls when DOM is ready
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', setupMobileControls)
+} else {
+  setupMobileControls()
+}
